@@ -1,0 +1,115 @@
+[wandb]
+project = "sparkify_v2"
+key = ""
+
+[prefect]
+key = ""
+
+[dirs]
+init_path = "data"
+session_name = "sparkify"
+session_dir = "data/sparkify"
+raw_data_dir = "data/sparkify/raw_data"
+
+[generated_data]
+preprocessed = "data/sparkify/preprocessed_data.parquet"
+features = "data/sparkify/feature_engineered_data.parquet"
+proc_data = "data/sparkify/proc_data"
+pipeline_model = "data/sparkify/pipeline_model"
+models_dir = "data/sparkify/models"
+artifacts_dir = "data/sparkify/artifacts"
+
+[raw_data_s3]
+bucket_name = "udacity-dsnd"
+file_name = "sparkify/mini_sparkify_event_data.json"
+
+[spark]
+master = "local[*]"
+app_name = "Sparkify"
+
+[model_experiment]
+max_evals = 20
+seed = 42
+
+[model_explainability]
+n_samples = 50
+
+[models.LogisticRegression]
+class = "sklearn.linear_model.LogisticRegression"
+args.class_weight = "balanced"
+args.max_iter = 5000
+
+[models.RandomForestClassifier]
+class = "sklearn.ensemble.RandomForestClassifier"
+args.class_weight = "balanced"
+
+[models.DecisionTreeClassifier]
+class = "sklearn.tree.DecisionTreeClassifier"
+args.class_weight = "balanced"
+
+[models.XGBClassifier]
+class = "xgboost.XGBClassifier"
+args.scale_pos_weight = 1
+
+[models.GradientBoostingClassifier]
+class = "sklearn.ensemble.GradientBoostingClassifier"
+
+[models.HistGradientBoostingClassifier]
+class = "sklearn.ensemble.HistGradientBoostingClassifier"
+
+[hyperparameters.RandomForestClassifier.n_estimators]
+type = "quniform"
+args = [10, 1000, 10]
+
+[hyperparameters.RandomForestClassifier.max_depth]
+type = "quniform"
+args = [1, 20, 1]
+
+[hyperparameters.XGBClassifier.n_estimators]
+type = "quniform"
+args = [10, 1000, 10]
+
+[hyperparameters.XGBClassifier.max_depth]
+type = "quniform"
+args = [1, 20, 1]
+
+[hyperparameters.XGBClassifier.learning_rate]
+type = "uniform"
+args = [0.01, 1.0]
+
+[hyperparameters.DecisionTreeClassifier.max_depth]
+type = "quniform"
+args = [1, 20, 1]
+
+[hyperparameters.LogisticRegression.C]
+type = "uniform"
+args = [0.01, 10.0]
+
+[hyperparameters.GradientBoostingClassifier.n_estimators]
+type = "quniform"
+args = [10, 1000, 10]
+
+[hyperparameters.GradientBoostingClassifier.max_depth]
+type = "quniform"
+args = [1, 20, 1]
+
+[hyperparameters.GradientBoostingClassifier.learning_rate]
+type = "uniform"
+args = [0.01, 1.0]
+
+[hyperparameters.HistGradientBoostingClassifier.max_depth]
+type = "quniform"
+args = [1, 20, 1]
+
+[hyperparameters.HistGradientBoostingClassifier.learning_rate]
+type = "uniform"
+args = [0.01, 1.0]
+
+[hyperparameters.HistGradientBoostingClassifier.max_iter]
+type = "quniform"
+args = [10, 1000, 10]
+
+[hyperparameters.StackingClassifier.final_estimator__C]
+type = "uniform"
+args = [0.01, 10.0]
+
