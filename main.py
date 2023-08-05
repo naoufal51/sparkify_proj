@@ -1,11 +1,11 @@
 import toml
 from prefect import task, flow
 import importlib
-from sparkify_proj.experimenter.model_experimenter import ModelExperiment
-from sparkify_proj.preprocesser.preprocessing import Preprocessing
-from sparkify_proj.feature_eng.feature_engineering import FeatureEngineering
-from sparkify_proj.pipeline.pipeline import DataPipeline
-from sparkify_proj.explainer.model_explainer import ModelExplainer
+from sparkify_proj.model_experimenter import ModelExperiment
+from sparkify_proj.preprocessing import Preprocessing
+from sparkify_proj.feature_engineering import FeatureEngineering
+from sparkify_proj.pipeline import DataPipeline
+from sparkify_proj.model_explainer import ModelExplainer
 
 from typing import List, Optional, Dict, Any, Tuple
 import pandas as pd
