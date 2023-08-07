@@ -537,12 +537,12 @@ def sparkify_flow():
     config = load_config(config_file_path)
 
     # login to wandb
-    # wandb.login(key=config['wandb']['key'])
-    wandb.login(key=os.environ.get('WANDB'))
+    wandb.login(key=config['wandb']['key'])
+    # wandb.login(key=os.environ.get('WANDB'))
 
     # login to prefect cloud
-    # os.system(f'prefect cloud login -k {config["prefect"]["key"]}')
-    os.system(f'prefect cloud login -k {os.environ.get("PREFECT")}')
+    os.system(f'prefect cloud login -k {config["prefect"]["key"]}')
+    # os.system(f'prefect cloud login -k {os.environ.get("PREFECT")}')
 
     # initialize wandb run for the project
     run = wandb.init(project=config['wandb']['project'])
