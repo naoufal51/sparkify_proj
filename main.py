@@ -533,7 +533,7 @@ def log_wandb_artifact(artifact_name: str, dir_path: str, models_path: str, run)
 def sparkify_flow():
 
     # load config file
-    config_file_path = "config.toml"
+    config_file_path = "./config.toml"
     config = load_config(config_file_path)
 
     # login to wandb
