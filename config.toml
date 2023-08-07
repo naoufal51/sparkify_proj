@@ -1,9 +1,9 @@
 [wandb]
-key = "02dcc933a0413139527357ba6fc2032a65258d3c"
+key = ""
 project = "sparkify_v2"
 
 [prefect]
-key = "pnu_wer0aBKZBBptflYG1vwOuUNhfWk1N22q67W4"
+key = ""
 
 [dirs]
 init_path = "data"
