@@ -4,7 +4,7 @@ from sklearn.metrics import (precision_recall_curve, roc_curve, roc_auc_score, a
                              f1_score, precision_score, recall_score, brier_score_loss)
 import torch
 from torch.nn import Module
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Any
 from numpy import intp
 
 
@@ -17,7 +17,14 @@ class ModelEvaluatorOpt:
 
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Any):
+        """
+        Initialize the class.
+        
+        Args:
+            model (Any): Model to evaluate.
+        
+        """
         self.model = model
 
     @staticmethod

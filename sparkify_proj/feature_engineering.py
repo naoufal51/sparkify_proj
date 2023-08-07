@@ -19,7 +19,7 @@ class FeatureEngineering:
     Provides feature engineering steps for the Sparkify churn prediction.
 
     Attributes:
-        df (pd.Dataframe): Dataframe containg preprocessed sparkify data.
+        df (pd.DataFrame): Dataframe containg preprocessed sparkify data.
 
     """
 

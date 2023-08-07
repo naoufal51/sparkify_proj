@@ -6,7 +6,7 @@ from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler
 from pyspark.ml import Pipeline, PipelineModel
 from pyspark.ml.feature import StandardScaler
 from pyspark.sql.types import IntegerType
-from sparkify_proj.common.common import get_stratified_train_test_split, download_from_s3, remove_file, save_data, save_pd_parquet
+from .common import get_stratified_train_test_split, download_from_s3, remove_file, save_data, save_pd_parquet
 import pandas as pd
 import os
 from typing import Tuple, List
@@ -28,7 +28,7 @@ class DataPipeline:
         if not os.path.exists(self.localpath):
             os.makedirs(self.localpath)
 
-    def run(self) -> Tuple[pd.Dataframe, pd.Dataframe, pd.Dataframe, pd.Dataframe]:
+    def run(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Run the pipeline.
         Saves to parquet the transformed data and the pipeline model.
@@ -136,7 +136,7 @@ class DataPipeline:
                          'stddev_songs_per_session', 'stddev_time_between_sessions', 'gender_vec', 'level_vec', 'platform_vec_0', 'platform_vec_1', 'platform_vec_2', 'browser_vec_0', 'browser_vec_1', 'browser_vec_2']
         return feature_names
 
-    def transform_to_pandas_inference(self, data: DataFrame) -> pd.Dataframe:
+    def transform_to_pandas_inference(self, data: DataFrame) -> pd.DataFrame:
         """
         Converts spark dataframe to pandas dataframe for inference pipeline.
 

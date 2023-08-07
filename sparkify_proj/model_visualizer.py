@@ -193,6 +193,21 @@ class ModelVisualizer:
 
     @staticmethod
     def plot_comp_calibration(y_test, y_pred,y_pred_calib, classifier_name, path: Optional[str] = None, calibrate: bool = False, show_plot: bool = False):
+        """
+        Plot calibration curve to evaluate the calibration of a classifier.
+
+        Args:
+            y_test (np.ndarray): True labels.
+            y_pred (np.ndarray): Predicted labels for uncalibrated models.
+            y_pred_calib (np.ndarray): Predicted labels for calibrated models.
+            classifier_name (str): Name of the classifier.
+            path (Optional[str]): Path to save the plot.
+            calibrate (bool): If the model is calibrated.
+            show_plot (bool): If the plot is to be shown.
+
+        Returns:
+            None
+        """
         # plot calibration curve
         print(classifier_name)
 

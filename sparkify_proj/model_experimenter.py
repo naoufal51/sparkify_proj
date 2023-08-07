@@ -1,8 +1,8 @@
 import json
-from optimizer.model_optimizer import ModelOptimizer
-from trainer.model_trainer import ModelTrainer, CalibratedModelTrainer
-from visualizer.model_visualizer import ModelVisualizer
-from evaluator.model_evaluator import ModelEvaluatorOpt
+from .model_optimizer import ModelOptimizer
+from .model_trainer import ModelTrainer, CalibratedModelTrainer
+from .model_visualizer import ModelVisualizer
+from .model_evaluator import ModelEvaluatorOpt
 from sklearn.metrics import brier_score_loss, log_loss
 from typing import List, Dict, Optional, Callable, Any
 import os
@@ -13,13 +13,6 @@ import logging
 import pandas as pd
 import sys
 sys.path.append('../')  # Add the parent directory to the Python path
-
-# create directory for logs if it does not exist
-if not os.path.exists('logs'):
-    os.makedirs('logs')
-# setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename='logs/model_experimenter.log')
 
 
 class ModelExperiment:
@@ -35,6 +28,18 @@ class ModelExperiment:
     """
 
     def __init__(self, classifiers: Dict[str, Any], spaces: Dict[str, Any], results: Dict[str, Any] = None, seed: int = 42, workdir: str = '.', max_evals: int = 10):
+        """
+        ModelExperiment class constructor.
+        
+        Args:
+            classifiers (dict): Classifiers to evaluate.
+            spaces (dict): Parameter spaces for each classifier to be used for hyperopt.
+            results (dict): dictionnary to store results.
+            seed (int): Random seed for reproducibility.
+            workdir (str): Path to the directory where to store the results.
+            max_evals (int): Maximum number of evaluations for each classifier.
+        
+        """
         self.classifiers = classifiers
         self.spaces = spaces
         self.seed = seed
@@ -182,6 +187,17 @@ class ModelExperiment:
         self.metrics[classifier_name] = metrics
 
     def _train_and_evaluate(self, classifier: Any, classifier_name: str, model_trainer: ModelTrainer, model_optimizer: ModelOptimizer, X_test: pd.DataFrame, y_test: pd.DataFrame):
+        """
+        Internal method for training and evaluating a given classifier.
+
+        Args:
+            classifier (Any): Classifier to train and evaluate.
+            classifier_name (str): Name of the classifier.
+            model_trainer (ModelTrainer): ModelTrainer object to train the classifier.
+            model_optimizer (ModelOptimizer): ModelOptimizer object to do hyperparamter optimization.
+            X_test (pd.DataFrame): Feature data from the test set.
+            y_test (pd.DataFrame): Label data from test set.        
+        """
         best_params = model_optimizer.optimize(
             classifier, self.spaces[classifier_name])
         print(f'Best parameters for {classifier_name}: {best_params}')

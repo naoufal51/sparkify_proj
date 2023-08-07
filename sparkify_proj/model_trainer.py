@@ -17,6 +17,15 @@ class ModelTrainer:
     """
 
     def __init__(self, X: pd.DataFrame, y: pd.DataFrame, seed: int):
+        """
+        ModelTrainer class constructor.
+
+        Args:
+            X: Dataframe with feature data
+            y: DataFrame with label data
+            seed: random seed for reproducibility
+    
+        """
         self.X = X
         self.y = y.values
         self.weights = self.calculate_weights()
@@ -48,15 +57,18 @@ class ModelTrainer:
 
         if isinstance(classifier, XGBClassifier):
             self.params['scale_pos_weight'] = self.weights[0]/self.weights[1]
-        elif 'class_weight' in self.params.keys():
+        
+        if 'class_weight' in classifier.get_params().keys():
             self.params['class_weight'] = 'balanced'
 
         # Set the seed
-        self.params['random_state'] = self.seed
+        if 'random_state' in self.params.keys():
+            self.params['random_state'] = self.seed
 
         classifier.set_params(**self.params)
         classifier.fit(self.X, self.y)
         return classifier
+
 
 
 class CalibratedModelTrainer(ModelTrainer):
@@ -94,8 +106,9 @@ class CalibratedModelTrainer(ModelTrainer):
         elif 'class_weight' in self.params.keys():
             self.params['class_weight'] = 'balanced'
 
-        # Set the seed
-        self.params['random_state'] = self.seed
+        # Set the seed if random_state is in attributes
+        if 'random_state' in self.params.keys():
+            self.params['random_state'] = self.seed
 
         classifier.set_params(**self.params)
         classifier.fit(self.X, self.y)

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import hyperopt
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials, space_eval
+from sklearn.ensemble import StackingClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import fbeta_score, make_scorer
 from xgboost import XGBClassifier
@@ -19,6 +20,14 @@ class ModelOptimizer:
     """
 
     def __init__(self, X, y, max_evals=50):
+        """
+        Constructor of the ModelOptimizer class.
+
+        Args:
+            X (pd.Dataframe): Dataframe containing the feature data
+            y (pd.Dataframe): Dataframe containing the label data
+            max_evals (int): Maximum number of evaluations for Hyperopt. Defaults to 50.
+        """
         self.X = X
         self.y = y
         self.max_evals = max_evals
@@ -98,14 +107,33 @@ class ModelOptimizer:
 
         def objective(params):
             params = self.type_casting(params)
+
             clf = classifier
-            if isinstance(clf, XGBClassifier):
+
+            # If optimizing StackingClassifier, update parameters of final_estimator
+            if isinstance(clf, StackingClassifier):
+                final_estimator_params = {
+                    'C': params.pop('final_estimator__C')}
+                clf.final_estimator.set_params(**final_estimator_params)
+
+            # Handle the case of XGBClassifier separately
+            elif isinstance(clf, XGBClassifier):
                 weights = self.calculate_weights()
                 params['scale_pos_weight'] = weights[0]/weights[1]
+                clf.set_params(**params)
+
+            # Handle class_weight parameter
             elif 'class_weight' in params.keys():
                 params['class_weight'] = 'balanced'
-            clf.set_params(**params)
+                clf.set_params(**params)
+
+            # Remaining cases
+            else:
+                clf.set_params(**params)
+
             score = cross_val_score(clf, self.X, self.y, cv=3, scoring=make_scorer(
                 self.f2_score), n_jobs=-1).mean()
             return {'loss': -score, 'status': STATUS_OK}
+
         return objective
+

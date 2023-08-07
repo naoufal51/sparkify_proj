@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch.nn import Module
 from typing import List, Any
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, HistGradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, HistGradientBoostingClassifier, StackingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
@@ -16,6 +16,18 @@ class ModelExplainer:
     """
     Class to conduct model explanaiton through shapeley values.
     We use shap library to compute the shapley values and visualize them.
+
+    Attributes:
+        model (Any): Model to explain. (Pytorch model, sklearn model or xgboost model)
+        model_name (str): Name of the model to be explained
+        X_train (np.ndarray): Training data.
+        X_test (np.ndarray): Test data.
+        feature_names (List[str]): Feature names.
+        tree_models (List[Any]): List of tree based models.
+        kernel_models (List[Any]): List of kernel based models.
+        X_train_pd (pd.DataFrame): Training data in pandas format with feature names.
+        X_test_pd (pd.DataFrame): Test data in pandas format with feature names.
+        explainer (Any): Explainer object from shap library.
     """
 
     def __init__(self, model: Any, model_name: str, X_train: np.ndarray, X_test: np.ndarray, feature_names: List[str]):
@@ -36,6 +48,7 @@ class ModelExplainer:
         self.feature_names = feature_names
         self.tree_models = [RandomForestClassifier, DecisionTreeClassifier,
                             GradientBoostingClassifier, XGBClassifier, HistGradientBoostingClassifier]
+        self.kernel_models = [LogisticRegression, StackingClassifier]
         self.X_train_pd = pd.DataFrame(
             self.X_train, columns=self.feature_names)
 
@@ -54,7 +67,7 @@ class ModelExplainer:
             self.explainer = shap.DeepExplainer(self.model, self.X_train)
         elif any([isinstance(self.model, m) for m in self.tree_models]):
             self.explainer = shap.TreeExplainer(self.model)
-        elif isinstance(self.model, LogisticRegression):
+        elif any([isinstance(self.model, m) for m in self.kernel_models]):
             self.explainer = shap.KernelExplainer(lambda x: self.model.predict(pd.DataFrame(
                 x, columns=self.feature_names)), shap.sample(self.X_train_pd, 100), feature_names=self.feature_names)
 
@@ -118,21 +131,22 @@ class ModelExplainer:
         Plot the shapley values for the given model.
 
         Args:
-            sample_index (int): Sample index to plot. Defaults to 0.
-            output_index (int): Output index to plot. Defaults to 0.
-            path (str): Path to save the plot. Defaults to None.
-
+            sample_index (int, optional): Sample index to plot. Defaults to 0.
+            output_index (int, optional): Output index to plot. Defaults to 0.
+            path ([type], optional): Path to save the plot. Defaults to None.
 
         Raises:
             Exception: If the shap values have not been computed.
         """
+        # check if the shap values have been computed. Throw exception if not.
         if not hasattr(self, 'shap_values'):
             raise Exception("Please compute the shap values first.")
 
-        # get the expected_value and shap_values for the specified output
-        if np.issubdtype(type(self.explainer.expected_value), np.floating):
+        # check if the expected value is a float (be careful with list of 1 element check len)
+        if np.issubdtype(type(self.explainer.expected_value), np.floating) or len(self.explainer.expected_value) == 1:
             expected_value = self.explainer.expected_value
             shap_values = self.shap_values
+
         else:
             expected_value = self.explainer.expected_value[output_index]
             shap_values = self.shap_values[output_index]
@@ -150,3 +164,4 @@ class ModelExplainer:
         plt.show()
         plt.clf()
         plt.close()
+
