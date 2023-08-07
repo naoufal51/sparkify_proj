@@ -28,7 +28,7 @@ class ModelEvaluatorOpt:
         self.model = model
 
     @staticmethod
-    def load_model(path: str):
+    def load_model(path: str) -> Any:
         """
         Load a model from disk.
         """

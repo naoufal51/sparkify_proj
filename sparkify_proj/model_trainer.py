@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from xgboost import XGBClassifier
 from sklearn.calibration import CalibratedClassifierCV
+from typing import Dict, Any
+
+
 
 
 class ModelTrainer:
@@ -32,16 +35,21 @@ class ModelTrainer:
         self.params = {}
         self.seed = seed
 
-    def calculate_weights(self):
+    def calculate_weights(self) -> Dict[int, float]:
         """
         Compute the weights for the classes.
         This is useful for imbalanced classes.
         (Here we are using it for XGBClassifier)
+
+        Returns:
+            weights: Weights for the classes (binary classification)
+        
         """
         class_weight_current = len(self.y) / (2.0 * np.bincount(self.y))
-        return {0: class_weight_current[0], 1: class_weight_current[1]}
+        weights = {0: class_weight_current[0], 1: class_weight_current[1]}
+        return weights
 
-    def train(self, classifier, precomputed_params=None):
+    def train(self, classifier: Any, precomputed_params: Dict[str, Any] = None) -> Any:
         """
         Train the binary classifier.
 
@@ -84,10 +92,19 @@ class CalibratedModelTrainer(ModelTrainer):
     """
 
     def __init__(self, X: pd.DataFrame, y: pd.DataFrame, seed: int):
+        """
+        CalibratedModelTrainer class constructor.
+
+        Args:
+            X (pd.DataFrame): Dataframe with feature data
+            y (pd.DataFrame): DataFrame with label data
+            seed (int): random seed for reproducibility
+    
+        """
         super().__init__(X, y, seed)
         self.weights = self.calculate_weights()
 
-    def train(self, classifier, precomputed_params=None):
+    def train(self, classifier: Any, precomputed_params: Dict[str, Any] = None) -> Any:
         """
         Train the binary classifier.
 

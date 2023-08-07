@@ -24,6 +24,13 @@ class FeatureEngineering:
     """
 
     def __init__(self, df: DataFrame):
+        """
+        Initialize the feature engineering class.
+
+        Args:
+            df (DataFrame): Dataframe containg preprocessed sparkify music streaming platform data.
+        """
+
         self.df = df
 
     def feature_engineering(self) -> DataFrame:

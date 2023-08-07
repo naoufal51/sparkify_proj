@@ -1,4 +1,5 @@
 import httpagentparser
+from pyspark.sql import DataFrame, SparkSession
 
 from pyspark.sql.functions import udf, when, col, max
 from pyspark.sql.types import IntegerType, StructType, StructField, StringType
@@ -7,7 +8,19 @@ from typing import Tuple, List, Dict
 
 
 class Preprocessing:
-    def __init__(self, df):
+    """
+    Preprocessing class.
+
+    Attributes:
+        df (DataFrame): Sparkify music stream Dataframe to preprocess.
+    """
+    def __init__(self, df: DataFrame):
+        """
+        Preprocessing class constructor.
+
+        Args:
+            df (DataFrame): Sparkify music stream Dataframe to preprocess.
+        """
         self.df = df
 
     @staticmethod
@@ -83,7 +96,7 @@ class Preprocessing:
         self.df = self.df.drop('Agent_extact')
         return self
 
-    def preprocess_data(self):
+    def preprocess_data(self) -> DataFrame:
         """
         Pipeline to preprocess the data.
         It is composed of the following steps:

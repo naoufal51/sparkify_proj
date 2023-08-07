@@ -18,10 +18,19 @@ class DataPipeline:
 
     Attributes:
         agg_features (DataFrame): spark dataframe containing aggregated features
-        path (str): path to the project root
+        local_path (str): path to the project root to store processed data
+        model_path (str): path to the project root to store the generated pipeline model
+
     """
 
     def __init__(self, agg_features: DataFrame, path: str):
+        """
+        DataPipeline class constructor.
+
+        Args:
+            agg_features (DataFrame): spark dataframe containing aggregated features
+            path (str): path to the project root
+        """
         self.agg_features = agg_features
         self.localpath = path + '/proc_data/'
         self.modelpath = path + '/pipeline_model/'
