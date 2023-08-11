@@ -165,3 +165,4 @@ data
 .gitignore
 app/wandb
 app/artifacts
+.DS_Store
