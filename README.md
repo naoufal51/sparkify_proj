@@ -62,3 +62,7 @@ cd sparkify_proj/
 python main.py
 
 ```
+
+## Acknowledgements
+- [Udacity](https://www.udacity.com/) for providing the Sparkify dataset
+
