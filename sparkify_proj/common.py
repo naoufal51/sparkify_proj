@@ -6,7 +6,9 @@ from pandas import DataFrame as pd_DataFrame
 import subprocess
 
 
-def get_stratified_train_test_split(df: DataFrame, target_col: str, train_prop: float, seed: int):
+def get_stratified_train_test_split(
+    df: DataFrame, target_col: str, train_prop: float, seed: int
+):
     """
     Perform stratified sampling to split the data into train and test sets.
     It is used to mitigate the effects of class imbalance when splitting the data.
@@ -17,25 +19,19 @@ def get_stratified_train_test_split(df: DataFrame, target_col: str, train_prop: 
         train_prop (float): Proportion of the data to use for training
         seed (int): Random seed for reproducibility
 
-    Returns: 
+    Returns:
         train (DataFrame): Dataframe containing the training data
         test (DataFrame): Dataframe containing the test data
     """
-    # Calculate the proportions of each class in the target column
-    majority_class = df.filter(col(target_col) == 0)
-    minority_class = df.filter(col(target_col) == 1)
+    # Initialize DataFrames for train and test
+    train, test = None, None
 
-    # Split the majority class into train and test sets
-    train_majority, test_majority = majority_class.randomSplit(
-        [train_prop, 1 - train_prop], seed)
-
-    # Split the minority class into train and test sets
-    train_minority, test_minority = minority_class.randomSplit(
-        [train_prop, 1 - train_prop], seed)
-
-    # Combine the train and test sets
-    train = train_majority.union(train_minority)
-    test = test_majority.union(test_minority)
+    for label in [0, 1]:
+        train_, test_ = df.filter(col(target_col) == label).randomSplit(
+            [train_prop, 1 - train_prop], seed
+        )
+        train = train_ if train is None else train.union(train_)
+        test = test_ if test is None else test.union(test_)
 
     return train, test
 
@@ -51,7 +47,8 @@ def download_from_s3(s3_path, local_path):
     """
     try:
         subprocess.check_output(
-            ['aws', 's3', 'cp', s3_path, local_path, '--no-sign-request'])
+            ["aws", "s3", "cp", s3_path, local_path, "--no-sign-request"]
+        )
         print(f"File downloaded successfully from {s3_path} to {local_path}")
     except subprocess.CalledProcessError as e:
         print(f"Error downloading file from {s3_path} to {local_path}: {e}")
@@ -81,7 +78,7 @@ def save_data(df: DataFrame, path: str, file_name: str):
         file_name (str): Name of the file to be saved
 
     """
-    df.write.mode('overwrite').parquet(path + file_name)
+    df.write.mode("overwrite").parquet(path + file_name)
     print(f"File saved successfully to {path + file_name}")
 
 
@@ -95,5 +92,5 @@ def save_pd_parquet(df: pd_DataFrame, path: str, file_name: str):
         file_name (str): Name of the file to be saved
 
     """
-    df.to_parquet(path + file_name, compression='gzip')
+    df.to_parquet(path + file_name, compression="gzip")
     print(f"File saved successfully to {path + file_name}")
