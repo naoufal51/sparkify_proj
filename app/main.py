@@ -20,25 +20,23 @@ from fastapi import APIRouter
 from starlette.responses import FileResponse
 
 
-# threading lock
-spark_lock = Lock()
-
+# Config for wandb
 wandb_key = os.environ.get("WANDB_API_KEY")
 wandb.login(key=wandb_key)
 
 wandb_project = "sparkify_naoufal"
 
-# Config pipeline
 pipeline_name = "pipeline_model"
 pipeline_version = "v0"
 pipeline_name_version = f"{pipeline_name}:{pipeline_version}"
 
-# Config Model
 classifier_name = "XGBClassifier.pkl"
 classifier_version = "v0"
 classifier = f"{classifier_name}:{classifier_version}"
 
-# define app
+
+spark_lock = Lock()
+
 app = FastAPI()
 
 api_router = APIRouter()
@@ -97,7 +95,6 @@ def load_artifacts():
 def create_spark_session():
     import uuid
 
-    # Generate a unique app name
     app_name = f"Sparkify_{uuid.uuid4()}"
     spark = SparkSession.builder.master("local").appName(app_name).getOrCreate()
 
@@ -111,23 +108,32 @@ async def startup_event():
     spark = create_spark_session()
 
 
-@api_router.post("/testpost")
-def test_post():
-    return {"message": "Post successful!"}
-
-
 @api_router.post("/predict")
 async def predict(user_data_file: UploadFile = File(...)):
+    """
+    Serves the model inference endpoint.
+
+    Args:
+        user_data_file (UploadFile): The user data file.
+
+    Returns:
+        Dict: A dictionary containing:
+            - userId: user identification
+            - churn_probability: User churn probability
+            - SHAP_values: Get the importances of each feature that lead to the decision.
+
+    Exception:
+        HTTPException: If the user_data_file is not supported.
+
+
+    """
     try:
-        # Creating a temporary file
         with tempfile.NamedTemporaryFile(delete=True) as temp_file:
             temp_file.write(await user_data_file.read())
             temp_file.flush()
 
-            # Create a new spark session
             spark = create_spark_session()
 
-            # Read user data into a dataframe
             user_data = spark.read.json(temp_file.name, schema=schema)
 
             # Preprocess the data
@@ -142,29 +148,22 @@ async def predict(user_data_file: UploadFile = File(...)):
             data_pipeline = DataPipeline(feature_engineered_data, "./data")
             data_pipeline_data = data_pipeline.run_inference_pipeline(pipeline_model)
 
-            # Separate userId from other features
+            # Predict the churn probability
             user_id = data_pipeline_data["userId"]
             data_pipeline_data = data_pipeline_data.drop("userId", axis=1)
-
-            # Predict the churn probability
             predictions = model.predict_proba(data_pipeline_data)
 
             # Compute SHAP values
             explainer = shap.TreeExplainer(model)
             shap_values = explainer.shap_values(data_pipeline_data)
 
-            # Extract the probability of churn
+            # Returns churn probability and SHAP values for each user in a dictionnary
             churn_probabilities = [float(x[1]) for x in predictions]
-
-            # Convert SHAP values to list of lists for JSON serialization
             shap_values_list = shap_values.tolist()
-
-            # Create a dictionary with userIds as keys and (churn_probability, SHAP_values) as values
             prediction_and_explanation = []
             for uid, prob, shap_values in zip(
                 user_id, churn_probabilities, shap_values_list
             ):
-                # We convert the feature contributions into a dictionary to make it easier to interpret
                 contributions = dict(zip(data_pipeline_data.columns, shap_values))
                 prediction_and_explanation.append(
                     {
@@ -179,14 +178,11 @@ async def predict(user_data_file: UploadFile = File(...)):
             return {"prediction": prediction_and_explanation}
 
     except Exception as e:
-        # If any error occurred, stop the spark session and raise the exception
         raise HTTPException(status_code=400, detail=str(e))
 
 
-# serve dashboard (static file dist)
 app.include_router(api_router, prefix="/api")
 
-# app.mount("/", StaticFiles(directory="dashboard/dist", html=True), name="static")
 app.mount(
     "/dashboard/static",
     StaticFiles(directory="dashboard/dist", html=True),
