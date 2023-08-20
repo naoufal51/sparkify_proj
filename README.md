@@ -2,6 +2,9 @@
 
 Sparkify Churn Detection is a project designed to predict user churn on the fictitious Sparkify digital music service platform. The model would be crucial for the stakeholders at Sparkify to devise appropriate user retention strategies. The project features an interactive web dashboard and provides the capability to train the churn detection model using predefined configurations.
 
+https://github.com/naoufal51/disaster_response/assets/15954923/9297c5d9-cb7f-46af-88f0-fa7d5172f1cd
+
+
 ## Getting Started
 
 ### Web Application Setup:
