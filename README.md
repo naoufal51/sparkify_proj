@@ -2,10 +2,24 @@
 
 Sparkify Churn Detection is a project designed to predict user churn on the fictitious Sparkify digital music service platform. The model would be crucial for the stakeholders at Sparkify to devise appropriate user retention strategies. The project features an interactive web dashboard and provides the capability to train the churn detection model using predefined configurations.
 
+For more detailed explanation about the project please read our [article](https://medium.com/@naoufal51/user-churn-detection-for-a-music-streaming-service-fe1e7954f9a5).
+
+
 https://github.com/naoufal51/disaster_response/assets/15954923/9297c5d9-cb7f-46af-88f0-fa7d5172f1cd
 
 
 ## Getting Started
+
+### Artifacts
+
+The models and artifacts are located in Wandb project :
+https://wandb.ai/naoufal51/sparkify_naoufal
+
+### Data Exploration:
+You can check the data exploration of Sparkify Music Streaming data in the notebook:
+``` sh
+notebooks/sparkify-data-exploration.ipynb
+```
 
 ### Web Application Setup:
 Follow the steps below to set up and run the web dashboard:
@@ -27,7 +41,6 @@ cd ..
 ```sh
 uvicorn main:app --host 127.0.0.1 --port 8080
 ```
-
 
 
 ## Model Training:
